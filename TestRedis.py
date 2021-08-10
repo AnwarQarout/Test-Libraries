@@ -1,19 +1,19 @@
 import redis
 import redis.exceptions as redisError
 
+
 class TestRedis:
-
-
     """ Main initialization function to establish the connection to Redis """
-    def __init__(self,host,port):
+
+    def __init__(self):
         try:
-            self.con = redis.Redis(host=host,port=port,db=0)
+            self.con = redis.Redis(host="localhost", port=6379, db=0)
         except redisError.ConnectionError:
             print("An error occured while connecting. Make sure the Redist server is on and working.")
             raise
 
-
     """ Function to list all keys set in Redis"""
+
     def list_all_keys(self):
         list_of_keys = (self.con.keys())
         decoded_list_of_keys = []
@@ -24,8 +24,6 @@ class TestRedis:
             return "No keys are set in Redis."
         else:
             return decoded_list_of_keys
-
-
 
     """ Function to list all keys in a given pattern """
 
@@ -39,34 +37,57 @@ class TestRedis:
         else:
             return decoded_list_of_keys
 
-
-
     """ Function to delete a given key in Redist """
-    def delete_key(self,key):
+
+    def delete_key(self, key):
         if not self.con.exists(key):
             print("Key does not exist.")
         else:
             self.con.delete(key)
 
     """ Function to flush and clean the database, clearing the cache and all keys. """
+
     def clean_database(self):
         self.con.flushall()
         print("Redis is now flushed and cleared.")
 
     """ Function to create a key with a value in Redist"""
-    def create_key(self,key,value):
-        key_value=self.get_key_value(key)
+
+    def create_key(self, key, value):
+        key_value = self.get_key_value(key)
         if key_value is not None:
-            print("A key with that name already exists, with value ("+key_value+").")
+            print("A key with that name already exists, with value (" + key_value + ").")
             return
 
         else:
-            self.con.set(key,value)
+            self.con.set(key, value)
 
     """ Function to return the value of a key """
-    def get_key_value(self,key):
+
+    def get_key_value(self, key):
         if (self.con.exists(key)):
             key_value = self.con.get(key).decode()
             return key_value
         else:
             return
+
+    """ Function to read key/value pairs from a file and create them in Redis """
+
+    def create_keys_from_file(self, path):
+        key_file = open(path, "r")
+        for line in key_file:
+            if line is not None:
+                key = line.split(" ")
+                key[1]= key[1].strip()
+                self.create_key(key[0], key[1])
+
+
+    """ Function to establish connection with a given host and port """
+    def establish_connection(self, host, port):
+        try:
+            self.con = redis.Redis(host=host, port=port, db=0)
+        except redisError.ConnectionError:
+            print("An error occured while connecting. Make sure the Redist server is on and working.")
+            raise
+
+
