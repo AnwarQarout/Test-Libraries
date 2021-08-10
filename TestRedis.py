@@ -3,14 +3,21 @@ import redis.exceptions as redisError
 
 
 class TestRedis:
-    """ Main initialization function to establish the connection to Redis """
+    """ Main initialization function """
 
     def __init__(self):
+        self.con = None
+
+
+
+    """ Function to establish connection with a given host and port """
+    def establish_connection(self, host, port):
         try:
-            self.con = redis.Redis(host="localhost", port=6379, db=0)
+            self.con = redis.Redis(host=host, port=port, db=0)
         except redisError.ConnectionError:
-            print("An error occured while connecting. Make sure the Redist server is on and working.")
+            print("An error occured while connecting. Make sure the Redis server is on and working.")
             raise
+
 
     """ Function to list all keys set in Redis"""
 
@@ -81,13 +88,5 @@ class TestRedis:
                 key[1]= key[1].strip()
                 self.create_key(key[0], key[1])
 
-
-    """ Function to establish connection with a given host and port """
-    def establish_connection(self, host, port):
-        try:
-            self.con = redis.Redis(host=host, port=port, db=0)
-        except redisError.ConnectionError:
-            print("An error occured while connecting. Make sure the Redist server is on and working.")
-            raise
 
 
